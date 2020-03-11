@@ -1,11 +1,60 @@
 /**
- * @file 8queens1.js
+ * @file 8queens.js
  * @author Sergio Tabares Hernández <alu0101124896@ull.edu.es>
  * @since Winter 2020
  * College: University of La Laguna
  * Course: Computer Science - Interactive Aplication Programing
- * @description This program calculates all posible solutions of the 8 queens problem
+ * @description This program calculates all posible combinations of the 8 queens problem
  */
+
+/**
+ * Function that generates the slope and displacement of a line between two queens
+ *
+ * @param {{row, column}} firstQueen - The first of the queens
+ * @param {{row, column}} secondQueen - The second of the queens
+ * @returns {{slope, displacement}} Returns the slope and the displacement of the line
+ */
+function lineFromTo(firstQueen, secondQueen) {
+  let slope = (secondQueen.column - firstQueen.column) / (secondQueen.row - firstQueen.row);
+  let displacement = (slope * (-firstQueen.row)) + firstQueen.column;
+
+  return { slope: slope, displacement: displacement };
+}
+
+/**
+ * Function that checks if the queen is in a line
+ *
+ * @param {number} row - Candidate row to input a queen
+ * @param {number} column - Candidate column to input a queen
+ * @param {{slope, displacement}} line - Candidate line to be part of
+ * @returns {boolean} Returns true if the queen is in the line
+ */
+function isPointInLine(row, column, line) {
+  return ((line.slope * row + line.displacement - column) === 0);
+}
+
+/**
+ * Function that checks if the queen is in line with another two
+ *
+ * @param {number} row - Candidate row to input a queen
+ * @param {number} column - Candidate column to input a queen
+ * @returns {boolean} Returns true if the queen is not in line
+ */
+function checkLine(row, column) {
+  if (queens.length < 2) {
+    return true;
+  }
+  else {
+    for (let firstQueen = 0; firstQueen < queens.length - 1; firstQueen++) {
+      for (let secondQueen = firstQueen + 1; secondQueen < queens.length; secondQueen++) {
+        if (isPointInLine(row, column, lineFromTo(queens[firstQueen], queens[secondQueen]))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+}
 
 /**
  * Function that checks if the queen can be placed safely
@@ -30,7 +79,7 @@ function isSafe(row, column) {
       return false;
     }
   }
-  return true;
+  return checkLine(row, column);
 }
 
 /**
@@ -62,7 +111,7 @@ function extractQueen(row, column) {
  * @returns {boolean} Returns true if has found at least a solution
  */
 function placeQueens(column) {
-  if (column == board.length) {
+  if (column === board.length) {
     printSolution(board);
     numOfSolutions++;
     return true;
@@ -124,7 +173,7 @@ function initializeBoard(boardSize) {
  */
 function solvePuzzle(boardSize) {
   initializeBoard(boardSize);
-  if (placeQueens(0) == false) {
+  if (placeQueens(0) === false) {
     console.log('Solucion no encontrada');
   } else {
     console.log('Se han encontrado', numOfSolutions, 'soluciones')
@@ -136,7 +185,7 @@ function solvePuzzle(boardSize) {
  */
 function main() {
   if (process.argv.length !== 3 || isNaN(process.argv[2])) {
-    console.log('Error: Ejecute este programa aportando como argumento en la linea de comandos exactamente un numero entero.');
+    console.log('Error: Ejecute este programa aportando como argumento en la line de comandos exactamente un numero entero.');
   } else {
     const boardSize = Number(process.argv[2]);
     solvePuzzle(boardSize);
