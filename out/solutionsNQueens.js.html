@@ -1,13 +1,47 @@
-/**
- * @file 8queens.js
- * @author Sergio Tabares Hernández <alu0101124896@ull.edu.es>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: solutionsNQueens.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: solutionsNQueens.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file solutionsNQueens1.js
+ * @author Sergio Tabares Hernández &lt;alu0101124896@ull.edu.es>
  * @since Winter 2020
  * College: University of La Laguna
  * Course: Computer Science - Interactive Aplication Programing
- * @description This program calculates all posible combinations of the 8 queens problem with the exeption of having only two queens in line
+ * @description This program calculates the number of posible solutions of the N queens problem and the execution time
  */
 
 "use strict"
+
+// Cargado de la libreria perf_hooks
+const {
+  performance,
+  PerformanceObserver
+} = require('perf_hooks');
 
 /**
  * @description Function that generates the slope and displacement of a line between two queens
@@ -43,12 +77,12 @@ function isPointInLine(row, column, line) {
  * @returns {boolean} Returns true if the queen is not in line
  */
 function checkLine(row, column) {
-  if (queens.length < 2) {
+  if (queens.length &lt; 2) {
     return true;
   }
   else {
-    for (let firstQueen = 0; firstQueen < queens.length - 1; firstQueen++) {
-      for (let secondQueen = firstQueen + 1; secondQueen < queens.length; secondQueen++) {
+    for (let firstQueen = 0; firstQueen &lt; queens.length - 1; firstQueen++) {
+      for (let secondQueen = firstQueen + 1; secondQueen &lt; queens.length; secondQueen++) {
         if (isPointInLine(row, column, lineFromTo(queens[firstQueen], queens[secondQueen]))) {
           return false;
         }
@@ -66,17 +100,17 @@ function checkLine(row, column) {
  * @returns {boolean} Returns true if the queen can be placed safely
  */
 function isSafe(row, column) {
-  for (let columnIterator = 0; columnIterator < column; columnIterator++) {
+  for (let columnIterator = 0; columnIterator &lt; column; columnIterator++) {
     if (board[row][columnIterator]) {
       return false;
     }
   }
-  for (let rowIterator = row, columnIterator = column; rowIterator >= 0 && columnIterator >= 0; rowIterator-- , columnIterator--) {
+  for (let rowIterator = row, columnIterator = column; rowIterator >= 0 &amp;&amp; columnIterator >= 0; rowIterator-- , columnIterator--) {
     if (board[rowIterator][columnIterator]) {
       return false;
     }
   }
-  for (let rowIterator = row, columnIterator = column; columnIterator >= 0 && rowIterator < board.length; rowIterator++ , columnIterator--) {
+  for (let rowIterator = row, columnIterator = column; columnIterator >= 0 &amp;&amp; rowIterator &lt; board.length; rowIterator++ , columnIterator--) {
     if (board[rowIterator][columnIterator]) {
       return false;
     }
@@ -114,12 +148,12 @@ function extractQueen(row, column) {
  */
 function placeQueens(column) {
   if (column === board.length) {
-    printSolution(board);
+    // printSolution();
     numOfSolutions++;
     return true;
   } else {
     let resultFound = false;
-    for (let rowIterator = 0; rowIterator < board.length; rowIterator++) {
+    for (let rowIterator = 0; rowIterator &lt; board.length; rowIterator++) {
       if (isSafe(rowIterator, column, board)) {
         insertQueen(rowIterator, column);
         resultFound = placeQueens(column + 1) || resultFound;
@@ -135,13 +169,13 @@ function placeQueens(column) {
  */
 function printSolution() {
   let boardString = '  ';
-  for (let rowIterator = 0; rowIterator < board.length; rowIterator++) {
+  for (let rowIterator = 0; rowIterator &lt; board.length; rowIterator++) {
     boardString += rowIterator + ' ';
   }
   boardString += '\n';
-  for (let rowIterator = 0; rowIterator < board.length; rowIterator++) {
+  for (let rowIterator = 0; rowIterator &lt; board.length; rowIterator++) {
     boardString += rowIterator + ' ';
-    for (let columnIterator = 0; columnIterator < board.length; columnIterator++) {
+    for (let columnIterator = 0; columnIterator &lt; board.length; columnIterator++) {
       if (board[rowIterator][columnIterator]) {
         boardString += 'Q ';
       } else {
@@ -159,9 +193,9 @@ function printSolution() {
  * @param {number} boardSize - Size of board
  */
 function initializeBoard(boardSize) {
-  for (let rowIterator = 0; rowIterator < boardSize; rowIterator++) {
+  for (let rowIterator = 0; rowIterator &lt; boardSize; rowIterator++) {
     let tempBoardRow = [];
-    for (let columnIterator = 0; columnIterator < boardSize; columnIterator++) {
+    for (let columnIterator = 0; columnIterator &lt; boardSize; columnIterator++) {
       tempBoardRow[columnIterator] = 0;
     }
     board[rowIterator] = tempBoardRow;
@@ -186,15 +220,40 @@ function solvePuzzle(boardSize) {
  * @description Main function
  */
 function main() {
-  if (process.argv.length !== 2) {
-    console.log('Error: Ejecute este programa sin aportar ningun argumento en la line de comandos.');
+  if (process.argv.length !== 3 || isNaN(process.argv[2])) {
+    console.log('Error: Ejecute este programa aportando como argumento en la linea de comandos exactamente un numero entero.');
   } else {
-    const boardSize = Number(8);
+    const boardSize = Number(process.argv[2]);
+    const startTime = performance.now();
     solvePuzzle(boardSize);
+    const endTime = performance.now();
+    console.log('El programa ha tardado', (Math.round((endTime - startTime)) / 1000), 'segundos');
   }
 }
 
 let board = [];
 let queens = [];
 let numOfSolutions = 0;
-main();
+main();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#checkLine">checkLine</a></li><li><a href="global.html#extractQueen">extractQueen</a></li><li><a href="global.html#initializeBoard">initializeBoard</a></li><li><a href="global.html#insertQueen">insertQueen</a></li><li><a href="global.html#isPointInLine">isPointInLine</a></li><li><a href="global.html#isSafe">isSafe</a></li><li><a href="global.html#lineFromTo">lineFromTo</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#placeQueens">placeQueens</a></li><li><a href="global.html#printSolution">printSolution</a></li><li><a href="global.html#solvePuzzle">solvePuzzle</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Mar 11 2020 13:19:05 GMT+0000 (WET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

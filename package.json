@@ -1,0 +1,26 @@
+{
+  "name": "practica-4-8queens-alu0101124896",
+  "version": "1.0.0",
+  "description": "This directory is organised as follows:",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ULL-ESIT-INF-PAI-2019-2020/practica-4-8queens-alu0101124896.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ULL-ESIT-INF-PAI-2019-2020/practica-4-8queens-alu0101124896/issues"
+  },
+  "homepage": "https://github.com/ULL-ESIT-INF-PAI-2019-2020/practica-4-8queens-alu0101124896#readme",
+  "devDependencies": {
+    "jsdoc": "^3.6.3"
+  }
+}

@@ -1,13 +1,62 @@
 /**
- * @file 8queens1.js
+ * @file solutionsNQueens1.js
  * @author Sergio Tabares Hernández <alu0101124896@ull.edu.es>
  * @since Winter 2020
  * College: University of La Laguna
  * Course: Computer Science - Interactive Aplication Programing
- * @description This program calculates all posible solutions of the 8 queens problem
+ * @description This program calculates the number of posible solutions of the N queens problem and the execution time. More info at https://en.wikipedia.org/wiki/Eight_queens_puzzle
  */
 
 "use strict"
+
+/**
+ * @description Function that generates the slope and displacement of a line between two queens
+ *
+ * @param {{row, column}} firstQueen - The first of the queens
+ * @param {{row, column}} secondQueen - The second of the queens
+ * @returns {{slope, displacement}} Returns the slope and the displacement of the line
+ */
+function lineFromTo(firstQueen, secondQueen) {
+  let slope = (secondQueen.column - firstQueen.column) / (secondQueen.row - firstQueen.row);
+  let displacement = (slope * (-firstQueen.row)) + firstQueen.column;
+
+  return { slope: slope, displacement: displacement };
+}
+
+/**
+ * @description Function that checks if the queen is in a line
+ *
+ * @param {number} row - Candidate row to input a queen
+ * @param {number} column - Candidate column to input a queen
+ * @param {{slope, displacement}} line - Candidate line to be part of
+ * @returns {boolean} Returns true if the queen is in the line
+ */
+function isPointInLine(row, column, line) {
+  return ((line.slope * row + line.displacement - column) === 0);
+}
+
+/**
+ * @description Function that checks if the queen is in line with another two
+ *
+ * @param {number} row - Candidate row to input a queen
+ * @param {number} column - Candidate column to input a queen
+ * @returns {boolean} Returns true if the queen is not in line
+ */
+function checkLine(row, column) {
+  if (queens.length < 2) {
+    return true;
+  }
+  else {
+    for (let firstQueen = 0; firstQueen < queens.length - 1; firstQueen++) {
+      for (let secondQueen = firstQueen + 1; secondQueen < queens.length; secondQueen++) {
+        if (isPointInLine(row, column, lineFromTo(queens[firstQueen], queens[secondQueen]))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+}
 
 /**
  * @description Function that checks if the queen can be placed safely
@@ -32,7 +81,7 @@ function isSafe(row, column) {
       return false;
     }
   }
-  return true;
+  return checkLine(row, column);
 }
 
 /**
@@ -64,8 +113,8 @@ function extractQueen(row, column) {
  * @returns {boolean} Returns true if has found at least a solution
  */
 function placeQueens(column) {
-  if (column == board.length) {
-    printSolution(board);
+  if (column === board.length) {
+    // printSolution();
     numOfSolutions++;
     return true;
   } else {
@@ -107,12 +156,12 @@ function printSolution() {
 /**
  * @description Function that initializes the board to 0 
  *
- * @param {number} boardSize - Size of board
+ * @param {number} BOARD_SIZE - Size of board
  */
-function initializeBoard(boardSize) {
-  for (let rowIterator = 0; rowIterator < boardSize; rowIterator++) {
+function initializeBoard(BOARD_SIZE) {
+  for (let rowIterator = 0; rowIterator < BOARD_SIZE; rowIterator++) {
     let tempBoardRow = [];
-    for (let columnIterator = 0; columnIterator < boardSize; columnIterator++) {
+    for (let columnIterator = 0; columnIterator < BOARD_SIZE; columnIterator++) {
       tempBoardRow[columnIterator] = 0;
     }
     board[rowIterator] = tempBoardRow;
@@ -120,13 +169,13 @@ function initializeBoard(boardSize) {
 }
 
 /**
- * @description Function that starts the search of the solutions to the ptoblem
+ * @description Function that starts the search of the solutions to the problem
  *
- * @param {number} boardSize - Size of board
+ * @param {number} BOARD_SIZE - Size of board
  */
-function solvePuzzle(boardSize) {
-  initializeBoard(boardSize);
-  if (placeQueens(0) == false) {
+function solvePuzzle(BOARD_SIZE) {
+  initializeBoard(BOARD_SIZE);
+  if (placeQueens(0) === false) {
     console.log('Solucion no encontrada');
   } else {
     console.log('Se han encontrado', numOfSolutions, 'soluciones')
@@ -134,14 +183,24 @@ function solvePuzzle(boardSize) {
 }
 
 /**
- * @description Main function
+ * @description Function that reads the parameters from the command line and calls the function that starts to seach the solutions to the problem.
  */
 function main() {
-  if (process.argv.length !== 2) {
-    console.log('Error: Ejecute este programa sin aportar ningun argumento en la line de comandos.');
+
+  // Charging perf_hooks library
+  const {
+    performance,
+    PerformanceObserver
+  } = require('perf_hooks');
+
+  if (process.argv.length !== 3 || isNaN(process.argv[2])) {
+    console.log('Error: Ejecute este programa aportando como argumento en la linea de comandos exactamente un numero entero.');
   } else {
-    const boardSize = Number(8);
-    solvePuzzle(boardSize);
+    const BOARD_SIZE = Number(process.argv[2]);
+    const START_TIME = performance.now();
+    solvePuzzle(BOARD_SIZE);
+    const END_TIME = performance.now();
+    console.log('El programa ha tardado', (Math.round((END_TIME - START_TIME)) / 1000), 'segundos');
   }
 }
 
